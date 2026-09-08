@@ -1,0 +1,44 @@
+name: daily-hot-sectors
+
+on:
+  schedule:
+    # UTC 11:00 = 北京时间 19:00，周一至周五
+    - cron: "0 11 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-hot-sectors
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    # 5 次检查 x 10 分钟间隔 + 余量
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch today's article and generate data
+        run: python scripts/fetch_article.py --commit
+
+      - name: Failure context
+        if: failure()
+        run: |
+          git status --short || true
+          git log --oneline -3 || true
