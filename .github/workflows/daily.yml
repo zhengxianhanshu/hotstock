@@ -31,8 +31,8 @@ jobs:
 
       - name: Configure git
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "zhengxianhanshu"
+          git config user.email "14845282+zhengxianhanshu@users.noreply.github.com"
 
       - name: Fetch today's article and generate data
         run: python scripts/fetch_article.py --commit
